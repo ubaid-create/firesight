@@ -105,12 +105,12 @@ Full results are in [docs/VALIDATION_REPORT.md](docs/VALIDATION_REPORT.md) and o
 
 ## Running FireSight
 
-Requirements: Python 3.12, Node.js 20+, about 1 GB of disk space, internet access for the first download.
+Requirements: Python 3.13, Node.js 20+, about 1 GB of disk space, internet access for the first download.
 
-1. Create the Python environment.
+1. Create the Python environment with Python 3.13 (on Windows `py -3.13`; on macOS or Linux `python3.13`).
 
    ```bash
-   python -m venv .venv
+   py -3.13 -m venv .venv
    ```
 
    ```bash

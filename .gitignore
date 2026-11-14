@@ -10,6 +10,8 @@ data/metadata/logs/
 *.part
 # python
 .venv/
+.venv*/
+logs/
 __pycache__/
 *.pyc
 .pytest_cache/

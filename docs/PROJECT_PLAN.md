@@ -228,7 +228,7 @@ All numbers will be computed, none assumed. S-NPP is a reference, not ground tru
 
 ## F. Technical implementation
 
-**Stack.** Python 3.12 in `.venv`: pandas, numpy, pyarrow, duckdb, pyproj, shapely, scipy, scikit-learn, requests, python-dotenv, fastapi, uvicorn, pytest. geopandas only if shapely + pyproj prove insufficient. Frontend: React + Vite + TypeScript, MapLibre GL JS, ECharts. Storage: Parquet queried with DuckDB. No external database, no cloud services.
+**Stack.** Python 3.13 in `.venv` (moved from 3.12 on 2026-11-14 to match the team's contributors): pandas, numpy, pyarrow, duckdb, pyproj, shapely, scipy, scikit-learn, requests, python-dotenv, fastapi, uvicorn, pytest. geopandas only if shapely + pyproj prove insufficient. Frontend: React + Vite + TypeScript, MapLibre GL JS, ECharts. Storage: Parquet queried with DuckDB. No external database, no cloud services.
 
 **Precompute, then serve.** The pipeline writes normalized detections, a per-platform cell-day table, calibration parameters, and daily harmonized series for the country, each province and each district. Custom polygons are computed on request from the cell-day table (cells are small enough for this to be fast).
 
