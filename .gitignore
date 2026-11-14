@@ -1,0 +1,25 @@
+# secrets
+.env
+.env.*
+!.env.example
+# data (never commit raw or processed NASA data)
+data/raw/
+data/processed/
+data/boundaries/
+data/metadata/logs/
+*.part
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# node
+node_modules/
+frontend/dist/
+# misc
+.DS_Store
+Thumbs.db
+
+# local tool settings
+.claude/
+frontend/npm_install.log
