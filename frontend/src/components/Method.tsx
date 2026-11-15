@@ -53,7 +53,7 @@ export default function Method() {
         <tbody>
           {m?.carrier_periods?.map((c: any) => (
             <tr key={c.from}><td className="num">{c.from} – {c.to}</td><td>{c.carrier}</td>
-              <td>{c.method === "reference_observed" ? <span className="pill good">observed reference</span> : <span className="pill accent">calibrated / reconstructed</span>}</td></tr>
+              <td><span className="pill">{c.method === "reference_observed" ? "observed reference" : "calibrated / reconstructed"}</span></td></tr>
           ))}
         </tbody>
       </table>

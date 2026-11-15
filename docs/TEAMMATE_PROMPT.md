@@ -39,8 +39,7 @@ Satellites have tracked active-fire hotspots for over 20 years, but the record i
 
 ## 4. The problem we solved, in one paragraph
 
-NASA FIRMS has five satellites with different pixel sizes and overpass times. Merging their detections naively creates artificial jumps every time a satellite is added: in Pakistan's FIRMS data the naive union **rises 5.5× when S-NPP arrives in 2012**, while MODIS alone rises only **1.13×**. That jump is the satellites, not more burning. FireSight turns the five records into **one consistent burning-activity history for Pakistan from November 2000 to the latest available day (13 Nov 2026)**, and shows it as an interactive burning calendar with maps, anomalies, critical windows and validation. Tagline: *"One Earth. Multiple satellites. One harmonized fire history."*
-
+NASA FIRMS has five satellites with different pixel sizes and overpass times. Merging their detections naively creates artificial jumps every time a satellite is added: in Pakistan's FIRMS data the naive union **rises 5.5× when S-NPP arrives in 2012**, while MODIS alone rises only **1.13×**. That jump is the satellites, not more burning. FireSight turns the five records into **one consistent burning-activity history for Pakistan from November 2000 to the latest available day (13 Nov 2026)**, and shows it as an interactive burning calendar with maps, anomalies, critical windows and validation.
 ## 5. Features (all built and tested)
 
 | Feature | What it does | Challenge point |
@@ -174,7 +173,7 @@ Open http://localhost:8000. For frontend development, run `npm run dev` in `fron
 
 Build a **7-slide deck (hard limit, including title and intro slides)** and a **spoken script** for it, aimed at the five judging criteria. Suggested structure:
 
-1. **Title**: FireSight, tagline, team name, challenge name, a hero screenshot of the calendar.
+1. **Title**: FireSight, team name, challenge name, a hero screenshot of the calendar.
 2. **The problem**: five satellites, records that don't agree; the 5.5× artificial jump in 2012 (naive) vs 1.13× (MODIS alone). Who needs this: emergency managers, land managers, scientists in Pakistan (seasonal agricultural burning, forest fires such as Sherani 2022). → Impact, Relevance.
 3. **Our approach**: raw NASA FIRMS data → 1 km equal-area grid → 8-day calibration onto the S-NPP scale → one carrier sensor at a time → calendar, anomalies, windows. A simple pipeline diagram. → Creativity, Validity.
 4. **Proof it works**: the before/after chart and the validation tables (bias −73.9% → +1.0%, transition jump +385% → +6%), held-out years. → Validity, Best Use of Science.

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { addDays, fmt, get, niceDate, post } from "./api";
+import { addDays, fmt, get, post } from "./api";
 import { PALETTES } from "./palettes";
 import Calendar from "./components/Calendar";
 import FireMap, { Filters, Layers } from "./components/FireMap";
@@ -23,19 +23,24 @@ type Tab = "dashboard" | "stories" | "method";
 
 function Logo() {
   return (
-    <svg className="brand-mark" viewBox="0 0 32 32" aria-hidden>
-      <rect width="32" height="32" rx="7" fill="#151c26" />
-      <path d="M16 5c1.5 4.5 6 6.5 6 12a6 6 0 0 1-12 0c0-3 1.5-4.5 2.5-6 .3 2 1.3 3 2.3 3.4C14 11 15 8 16 5z" fill="#f0a03c" />
-      <circle cx="16" cy="18" r="2.6" fill="#151c26" />
+    <svg className="brand-mark" viewBox="9 4 14 20" aria-hidden>
+      <path fillRule="evenodd" d="M16 5c1.5 4.5 6 6.5 6 12a6 6 0 0 1-12 0c0-3 1.5-4.5 2.5-6 .3 2 1.3 3 2.3 3.4C14 11 15 8 16 5zM18.6 18a2.6 2.6 0 1 1-5.2 0a2.6 2.6 0 1 1 5.2 0z" fill="#f0a03c" />
     </svg>
   );
 }
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>("dashboard");
+  // Shareable links: ?tab=stories|method, ?aoi=PAK-ADM1-5, ?date=2022-05-20, ?story=sherani-2022
+  // Tab and area are read before the first render so the default area is never fetched first
+  // (an earlier, slower Pakistan response could otherwise overwrite the linked area).
+  const params = useMemo(() => new URLSearchParams(window.location.search), []);
+  const [tab, setTab] = useState<Tab>(() => {
+    const t = params.get("tab");
+    return t === "stories" || t === "method" ? t : "dashboard";
+  });
   const [meta, setMeta] = useState<any>(null);
   const [aois, setAois] = useState<any[]>([]);
-  const [aoi, setAoi] = useState("PAK");
+  const [aoi, setAoi] = useState(() => params.get("aoi") || "PAK");
   const [aoiInfo, setAoiInfo] = useState<any>(null);
   const [date, setDate] = useState<string | null>(null);
   const [range, setRange] = useState<[string, string]>(["2026-11-06", "2026-11-13"]);
@@ -54,15 +59,6 @@ export default function App() {
   const [bboxText, setBboxText] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
-
-  // Shareable links: ?tab=stories|method, ?aoi=PAK-ADM1-5, ?date=2022-05-20, ?story=sherani-2022
-  const params = useMemo(() => new URLSearchParams(window.location.search), []);
-  useEffect(() => {
-    const t = params.get("tab");
-    if (t === "stories" || t === "method") setTab(t);
-    const a = params.get("aoi");
-    if (a) setAoi(a);
-  }, []);
 
   useEffect(() => {
     get("meta").then((m) => {
@@ -85,9 +81,11 @@ export default function App() {
   }, [palette]);
 
   useEffect(() => {
+    let live = true; // ignore a reply that arrives after the area has changed again
     setAoiInfo(null);
     setOndemand(null);
-    get(`aoi/${aoi}`).then(setAoiInfo).catch((e) => setErr(e.message));
+    get(`aoi/${aoi}`).then((i) => live && setAoiInfo(i)).catch((e) => live && setErr(e.message));
+    return () => { live = false; };
   }, [aoi]);
 
   const provinces = useMemo(() => aois.filter((a) => a.level === "ADM1").sort((a, b) => a.name.localeCompare(b.name)), [aois]);
@@ -154,16 +152,14 @@ export default function App() {
     }
   }
 
-  const harmonized = !!aoiInfo?.harmonized;
+  // Only trust the flag once the loaded info belongs to the selected area (not the previous one).
+  const harmonized = !!aoiInfo?.harmonized && aoiInfo.aoi_id === aoi;
   return (
     <>
       <header className="topbar">
         <div className="brand">
           <Logo />
-          <div>
-            <div className="brand-name">FireSight</div>
-            <div className="brand-tag">One Earth. Multiple satellites. One harmonized fire history.</div>
-          </div>
+          <div className="brand-name">FireSight</div>
         </div>
         <nav className="tabs">
           {([["dashboard", "Dashboard"], ["stories", "Fire stories"], ["method", "Method & validation"]] as [Tab, string][]).map(([k, l]) => (
@@ -209,6 +205,12 @@ export default function App() {
               setStep={(i) => applyStep(story, i)} onClose={() => { setStory(null); setFocusYear(null); }} />
           )}
           <Kpis aoi={aoi} aoiInfo={aoiInfo} onPickDate={pickDate} />
+
+          {harmonized && (
+            <div style={{ marginTop: 14 }}>
+              <Calendar aoi={aoi} palette={palette} selected={date} onSelect={pickDate} focusYear={focusYear} />
+            </div>
+          )}
 
           <div className="grid main-row">
             <div className="card" style={{ padding: 12 }}>
@@ -256,10 +258,6 @@ export default function App() {
 
           {harmonized && (
             <>
-              <div style={{ marginTop: 14 }}>
-                <Calendar aoi={aoi} palette={palette} selected={date} onSelect={pickDate} focusYear={focusYear} />
-              </div>
-
               <div className="section-title">Sensor harmonization <small>raw, calibrated and harmonized series · {aoiInfo?.name}</small></div>
               <BeforeAfter aoi={aoi} onPickDate={pickDate} />
               <div className="grid two" style={{ marginTop: 14 }}>
@@ -281,8 +279,7 @@ export default function App() {
         </div>
       )}
       <footer className="foot">
-        FireSight · NASA Space Apps Challenge 2026 · Data: NASA FIRMS (MODIS C6.1, VIIRS S-NPP / NOAA-20 / NOAA-21), geoBoundaries.
-        {meta && <> Latest data {niceDate(meta.latest_date)} · calibration {meta.calibration_version}.</>} Hotspots are thermal anomalies, not confirmed wildfires.
+        FireSight · NASA Space Apps Challenge 2026
       </footer>
     </>
   );

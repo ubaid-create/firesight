@@ -28,7 +28,7 @@ export function Anomalies({ aoi, onPickDate }: { aoi: string; onPickDate: (d: st
                   <td className="r">{fmt(e.peak, 1)}<div className="faint" style={{ fontSize: 10.5 }}>{fmt(e.peak_lo, 0)}–{fmt(e.peak_hi, 0)}</div></td>
                   <td className="r">{fmt(e.base_median, 1)}</td>
                   <td className="r">{e.z_max === null ? "rank" : fmt(e.z_max, 1)}</td>
-                  <td>{e.reconstructed ? <span className="pill accent">reconstructed</span> : <span className="pill good">observed</span>}
+                  <td><span className="pill">{e.reconstructed ? "reconstructed" : "observed"}</span>
                     {e.provisional && <span className="pill warn" style={{ marginLeft: 3 }}>NRT</span>}</td>
                 </tr>
               ))}

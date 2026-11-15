@@ -1,7 +1,6 @@
 # FireSight
 
 **Harmonized MODIS and VIIRS Satellite Fire Intelligence Platform**
-*One Earth. Multiple satellites. One harmonized fire history.*
 
 NASA Space Apps Challenge 2026 · Challenge: *Harmonization of MODIS and VIIRS Hot Spots* · Team FireSight
 

@@ -16,7 +16,7 @@ Start the app first and open http://localhost:8000.
 | 1:50 | Top cards: *Now vs historical median* | "The same dates in every year, compared like for like. The latest weeks are flagged provisional because they rely on near-real-time data. After S-NPP stopped on 2 November 2026, NOAA-21 carries the record, calibrated to within about 1% on held-out data." |
 | 2:15 | *Method & validation* page | "Every number here is computed and tested on held-out years. We also show the limits: district estimates are less reliable, the earliest Terra years have the weakest support, and our calibration is never applied outside Pakistan." |
 | 2:40 | Back to the map: *Draw area* or a coordinate box outside Pakistan → *Fetch last 5 days* | "The app works anywhere FIRMS data can be fetched. Outside our processed region it shows raw recent detections and says clearly that no harmonized history exists there." |
-| 2:55 | — | "FireSight: one Earth, multiple satellites, one harmonized fire history." |
+| 2:55 | — | "FireSight: five satellites, one consistent fire history for Pakistan." |
 
 ## Before recording
 
