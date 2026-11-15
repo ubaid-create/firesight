@@ -122,14 +122,7 @@ Shareable links:
 
 ## How it works
 
-```mermaid
-flowchart LR
-  A["1 · Collect<br/>NASA FIRMS<br/>MODIS + VIIRS"] --> B["2 · Normalize<br/>one schema,<br/>UTC + local solar time"]
-  B --> C["3 · Spatial<br/>1 km equal-area grid,<br/>unique cells per satellite"]
-  C --> D["4 · Temporal<br/>8-day windows<br/>per province"]
-  D --> E["5 · Calibrate<br/>onto the VIIRS S-NPP scale,<br/>tested on held-out years"]
-  E --> F["6 · Intelligence<br/>index, calendar,<br/>anomalies, windows"]
-```
+![How FireSight works: six steps from raw NASA FIRMS detections to fire intelligence](docs/diagrams/how_it_works.png)
 
 1. **Collect satellite data.** Raw files from the FIRMS country archive (MODIS C6.1 2000–2025, VIIRS S-NPP 2012–2025, NOAA-20 2018–2025) and the FIRMS Area API (NOAA-21, 2026 data and the near-real-time gap). Files are never modified, and each one is checksummed in `data/metadata/manifest.json`.
 2. **Normalize.** Every FIRMS file layout is mapped to one schema. The original confidence (whose scales differ between sensors), both brightness channels, pixel size, product version, source file and row are kept. Each detection gets a UTC timestamp and a local solar time.
@@ -249,15 +242,7 @@ For frontend development, run `npm run dev` in `frontend/` (http://localhost:517
 
 ## Architecture
 
-```mermaid
-flowchart TB
-  F["NASA FIRMS<br/>country archive · Area API · missing-data table"] --> I["Ingestion<br/>requests · checksums · manifest"]
-  I --> P["Processing<br/>pandas · NumPy · pyproj · Shapely"]
-  P --> H["Harmonization engine<br/>1 km grid · 8-day windows · calibration<br/>SciPy · scikit-learn"]
-  H --> S[("Parquet files<br/>queried with DuckDB")]
-  S --> A["FastAPI<br/>REST endpoints · CSV export"]
-  A --> W["Web app<br/>React · TypeScript · Vite<br/>MapLibre GL · Apache ECharts"]
-```
+<p align="center"><img src="docs/diagrams/architecture.png" alt="FireSight architecture: NASA FIRMS, ingestion, processing, harmonization engine, Parquet and DuckDB storage, FastAPI, web app" width="620" /></p>
 
 ```
 backend/
