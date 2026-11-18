@@ -45,6 +45,13 @@ export function StoryBanner({ story, step, setStep, onClose }: { story: any; ste
         <div>
           {story.context.map((c: string, i: number) => <p key={i} style={{ margin: "0 0 6px", color: "#d6dee8" }}>{c}</p>)}
           <div className="faint" style={{ fontSize: 11.5 }}>{story.context_note}</div>
+          {story.sources?.length > 0 && (
+            <ol className="faint" style={{ fontSize: 11.5, margin: "4px 0 0", paddingLeft: 18 }} aria-label="Sources">
+              {story.sources.map((src: { label: string; url: string }) => (
+                <li key={src.url}><a href={src.url} target="_blank" rel="noopener noreferrer">{src.label}</a></li>
+              ))}
+            </ol>
+          )}
           {story.boundary_note && <div className="faint" style={{ fontSize: 11.5, marginTop: 4 }}>{story.boundary_note}</div>}
         </div>
         <div>

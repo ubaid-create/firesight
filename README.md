@@ -35,6 +35,7 @@
 - [Run FireSight locally](#run-firesight-locally)
 - [Architecture](#architecture)
 - [Data sources and acknowledgements](#data-sources-and-acknowledgements)
+- [Use of AI tools](#use-of-ai-tools)
 
 ---
 
@@ -104,12 +105,19 @@ Every number comes from NASA FIRMS data. Every result carries its source platfor
 | **Export** | Harmonized CSV (per-satellite contributions, uncertainty, method, anomaly, calibration version) and raw-detection CSV (source file and row). |
 | **Beyond Pakistan** | Areas outside the processed region are labelled "historical data not acquired" and can fetch recent raw FIRMS detections on demand. Pakistan's calibration is never applied to them. |
 
-<table>
-<tr>
-<td width="50%"><img src="docs/screenshots/02_story_sherani.png" alt="Sherani fire story" /><br/><sub>Fire story: Sherani chilgoza pine forest, May 2022</sub></td>
-<td width="50%"><img src="docs/screenshots/04_method.png" alt="Method and validation page" /><br/><sub>Method & validation page with live results</sub></td>
-</tr>
-</table>
+### Fire story: Sherani chilgoza pine forest, May 2022
+
+A guided case study on live NASA FIRMS data: the event (with cited press sources), where each satellite saw it, and how unusual it was against the same dates in 25 other years.
+
+![FireSight fire story for the Sherani chilgoza pine forest fire, May 2022: the story summary with FIRMS figures, the fire map with detections from four satellites and the peak-day panel, and the 2022 burning calendar with highly unusual days marked](docs/screenshots/showcase_story_sherani.png)
+
+### Method & validation
+
+Every calibration is tested on years the model never saw, and the results, the effect of each added satellite, reliability by scale and the limitations are all shown inside the app.
+
+![FireSight Method and validation page: calibration results on held-out years, artificial jumps removed for each added satellite, reliability by country, province and district, and the limitations shown to users](docs/screenshots/showcase_method_validation.png)
+
+<sub>Full-page captures: [fire story](docs/screenshots/02_story_sherani.png) · [method & validation](docs/screenshots/04_method.png)</sub>
 
 Shareable links:
 
@@ -122,13 +130,13 @@ Shareable links:
 
 ## How it works
 
-![How FireSight works: six steps from raw NASA FIRMS detections to fire intelligence](docs/diagrams/how_it_works.png)
+![How FireSight works: collect, normalize, grid, aggregate, harmonize and analyse, turning 1.87 million detections from five satellites into one consistent fire history](docs/diagrams/how_it_works.png)
 
-1. **Collect satellite data.** Raw files from the FIRMS country archive (MODIS C6.1 2000–2025, VIIRS S-NPP 2012–2025, NOAA-20 2018–2025) and the FIRMS Area API (NOAA-21, 2026 data and the near-real-time gap). Files are never modified, and each one is checksummed in `data/metadata/manifest.json`.
+1. **Collect.** Raw files from the FIRMS country archive (MODIS C6.1 2000–2025, VIIRS S-NPP 2012–2025, NOAA-20 2018–2025) and the FIRMS Area API (NOAA-21, 2026 data and the near-real-time gap). Files are never modified, and each one is checksummed in `data/metadata/manifest.json`.
 2. **Normalize.** Every FIRMS file layout is mapped to one schema. The original confidence (whose scales differ between sensors), both brightness channels, pixel size, product version, source file and row are kept. Each detection gets a UTC timestamp and a local solar time.
-3. **Spatial aggregation.** Detections are placed on a common **1 km equal-area grid** (EPSG:6933). For each satellite and day, an active cell counts once, which removes most of the pixel-size difference. Satellites are never summed.
-4. **Temporal aggregation.** Satellites are compared in **fixed 8-day windows per province**. These are long enough to smooth out clouds and overpass gaps, and short enough to resolve the burning seasons; daily navigation is kept.
-5. **Calibrate and harmonize.** On overlap years, each satellite is mapped onto the **VIIRS S-NPP reference scale**. The model is chosen by blocked-year cross-validation within the training years, with 80% prediction intervals. The record is then carried by one satellite at a time, so it never jumps:
+3. **Grid (spatial aggregation).** Detections are placed on a common **1 km equal-area grid** (EPSG:6933). For each satellite and day, an active cell counts once, which removes most of the pixel-size difference. Satellites are never summed.
+4. **Aggregate (temporal aggregation).** Satellites are compared in **fixed 8-day windows per province**. These are long enough to smooth out clouds and overpass gaps, and short enough to resolve the burning seasons; daily navigation is kept.
+5. **Harmonize (calibration).** On overlap years, each satellite is mapped onto the **VIIRS S-NPP reference scale**. The model is chosen by blocked-year cross-validation within the training years, with 80% prediction intervals. The record is then carried by one satellite at a time, so it never jumps:
 
    | Period | Source of the record |
    |---|---|
@@ -138,7 +146,7 @@ Shareable links:
    | From 3 Nov 2026 | Calibrated NOAA-21 |
 
    Provinces are calibrated directly, the country is the sum of its provinces, and districts receive shares of their province.
-6. **Generate fire intelligence.**
+6. **Analyse (fire intelligence).**
    - **Activity index (0–100):** the percentile of a day among the area's own active days.
    - **Anomalies:** a robust seasonal z-score, (x − median) / (1.4826 × MAD), against the same dates ±7 days in every other year.
    - **Critical windows:** weeks elevated in at least half of the complete years.
@@ -242,7 +250,13 @@ For frontend development, run `npm run dev` in `frontend/` (http://localhost:517
 
 ## Architecture
 
-<p align="center"><img src="docs/diagrams/architecture.png" alt="FireSight architecture: NASA FIRMS, ingestion, processing, harmonization engine, Parquet and DuckDB storage, FastAPI, web app" width="620" /></p>
+![FireSight architecture: NASA FIRMS data flow through a Python data pipeline and harmonization engine into a Parquet and DuckDB analytical store, served by a FastAPI REST API to a React web application](docs/diagrams/architecture.png)
+
+FireSight has two halves that meet at one analytical store:
+
+- **Offline pipeline (run when new data arrive).** Downloads NASA FIRMS and boundary data, then normalizes, grids, calibrates, harmonizes and validates it, writing every result as Parquet files with a SHA-256 record of each source file.
+- **Online application (per request).** A FastAPI service queries those files in-process with DuckDB and returns JSON or CSV to the React web app. No database server is needed, and the whole app runs as one process on a laptop.
+- **Runtime services.** The browser loads NASA GIBS imagery and Esri basemap tiles directly. Recent FIRMS data for areas outside Pakistan are requested by the server, so the FIRMS key never reaches the browser.
 
 ```
 backend/
@@ -254,10 +268,10 @@ backend/
   api/            FastAPI app (DuckDB over Parquet); also serves the built frontend
 frontend/         React + Vite + TypeScript, MapLibre GL, Apache ECharts
 validation/       validation experiments -> results.json
-scripts/          download, pipeline, EDA, API probes
-docs/             plan, EDA and validation reports, screenshots, demo script
+scripts/          data download, processing pipeline, EDA report
+docs/             EDA and validation reports, screenshots, diagrams
 tests/            pytest suites
-data/             raw NASA files, processed data, metadata (not in Git)
+data/             metadata (download manifest, data inventory); raw and processed data are not in Git
 ```
 
 ## Data sources and acknowledgements
@@ -270,6 +284,23 @@ data/             raw NASA files, processed data, metadata (not in Git)
 - **Open-source software:** FastAPI, DuckDB, pandas, NumPy, PyArrow, pyproj, Shapely, SciPy, scikit-learn, React, Vite, TypeScript, MapLibre GL JS, Apache ECharts.
 
 We acknowledge the use of data and imagery from NASA's Fire Information for Resource Management System (FIRMS), part of NASA's Earth Science Data and Information System (ESDIS).
+
+## Use of AI tools
+
+In line with the NASA Space Apps policy on Super Intelligence (SI) tools, we disclose where AI assisted this project. FireSight was developed with the help of **Claude** (Anthropic), used through Claude Code.
+
+| Area | How AI assisted |
+|---|---|
+| Planning and research | Brainstorming the approach and features; exploring NASA FIRMS data availability and documentation |
+| Data analysis | Writing and running the exploratory-analysis and validation scripts; interpreting their results |
+| Code | Backend, frontend and tests; debugging and troubleshooting |
+| Writing | This README, the EDA and validation reports, and presentation material |
+| Visual design | Application layout and styling, the diagrams in `docs/diagrams/`, and the showcase images composed from app screenshots |
+
+- **Data and results are not AI-generated.** Every figure is computed from NASA FIRMS data by the code in this repository and can be reproduced by following [Run FireSight locally](#run-firesight-locally).
+- **The team reviewed and tested the work.** Methods, results and limitations were checked by the team, and the automated test suite covers parsers, the grid, calibration, anomalies, windows and the API.
+- **FireSight contains no AI assistant or generative model.** Its harmonization uses statistical calibration models fitted to the years in which satellites overlap.
+- **Commit metadata records it.** Commits made with AI assistance carry a `Co-Authored-By: Claude` line in the Git history.
 
 ## License
 

@@ -21,14 +21,23 @@ STORIES = [
         "start": "2022-05-01", "end": "2022-06-10", "focus": "2022-05-20",
         "bounds": [69.6, 31.1, 70.35, 31.8],
         "context": [
-            "Press reports in May 2022 described a large fire in the chilgoza (Pinus gerardiana) pine forests "
-            "of Sherani district, on the Koh-e-Sulaiman range in north-eastern Balochistan.",
-            "Chilgoza pine nuts are an important source of income for local communities, and the Sherani forests "
-            "are among the largest chilgoza stands in the region.",
-            "Firefighting was reported to include aerial support, including an aircraft provided by Iran.",
+            "In May 2022 a large fire burned the chilgoza (pine-nut) forest of Sherani district, in the "
+            "Koh-e-Sulaiman range of north-eastern Balochistan, a range described as home to the world's largest "
+            "pine-nut forest.",
+            "The forests matter to local livelihoods: about half of the local population is reported to depend on "
+            "income from chilgoza forests.",
+            "An Iranian Il-76 air tanker joined the firefighting effort after the fire had burned for about two weeks.",
         ],
-        "context_note": "Context is summarised from press reports and should be checked against the team's cited "
-                        "sources before presentation. All figures in this story are computed from FIRMS data.",
+        "context_note": "Background from the press reports cited below. All figures in this story are computed "
+                        "from NASA FIRMS data.",
+        "sources": [
+            {"label": "Arab News, 24 May 2022: “After two weeks raging, Iranian air tanker puts out forest "
+                      "fire in southwest Pakistan”",
+             "url": "https://arabnews.pk/node/2088541"},
+            {"label": "The Friday Times, 20 Sep 2022: “Long-term impacts of ‘terrible’ fire season in "
+                      "Pakistan’s mountains”",
+             "url": "https://www.thefridaytimes.com/20-Sep-2022/long-term-impacts-of-terrible-fire-season-in-pakistan-s-mountains"},
+        ],
         "boundary_note": "The geoBoundaries 2019 district layer used by FireSight does not separate Sherani "
                          "district; these detections fall inside the polygon labelled Zhob. The story therefore "
                          "uses an event box drawn around the detections.",
