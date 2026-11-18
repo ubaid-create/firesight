@@ -25,3 +25,16 @@ Thumbs.db
 # local tool settings
 .claude/
 frontend/npm_install.log
+*.tsbuildinfo
+
+# kept locally, not published
+docs/TEAMMATE_PROMPT.md
+docs/PROJECT_PLAN.md
+docs/PLAN_AMENDMENT_2.md
+docs/DEMO_SCRIPT.md
+docs/screenshots/03_punjab_full.png
+docs/screenshots/05_stories.png
+docs/screenshots/07_story_punjab.png
+scripts/test_api_routes.py
+data/metadata/yearly_summary_files.txt
+data/metadata/firms_data_availability.csv
